@@ -15,13 +15,27 @@ cursor.execute("""CREATE TABLE flyprodusent (
                     nasjonalitet TEXT,
                     stiftelsesår INTEGER)""")
 
+cursor.execute("""CREATE TABLE setekonfigurasjon (
+                    ID INTEGER PRIMARY KEY,
+                    antallseter INTEGER,
+                    antallrader INTEGER)""")
+
+cursor.execute("""CREATE TABLE setekonf_rad (
+                    setekonfigurasjonID INTEGER,
+                    radnummer INTEGER,
+                    antallseter INTEGER,
+                    vedNødutgang BOOLEAN,
+                    PRIMARY KEY (setekonfigurasjonID, radnummer),
+                    FOREIGN KEY (setekonfigurasjonID) REFERENCES setekonfigurasjon(ID))""")
+
 cursor.execute("""CREATE TABLE flytype (
                     navn TEXT PRIMARY KEY,
-                    antallseter INTEGER,
+                    setekonfigurasjonID INTEGER,
                     førsteProduksjonsår INTEGER,
                     sistProduksjonsår INTEGER,
                     produsent TEXT,
-                    FOREIGN KEY (produsent) REFERENCES flyprodusent(navn))""")
+                    FOREIGN KEY (produsent) REFERENCES flyprodusent(navn),
+                    FOREIGN KEY (setekonfigurasjonID) REFERENCES setekonfigurasjon(ID))""")
 
 # Create flyrute with TEXT flyrutenummer
 cursor.execute("""CREATE TABLE flyrute (

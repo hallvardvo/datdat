@@ -18,13 +18,41 @@ cursor.execute("""INSERT INTO flyprodusent (navn, nasjonalitet, stiftelsesår)
 cursor.execute("""INSERT INTO flyprodusent (navn, nasjonalitet, stiftelsesår) 
                 VALUES ('De Havilland Canada', 'Kanadisk', 1928)""")
 
+# Insert setekonfigurasjoner
+cursor.execute("""INSERT INTO setekonfigurasjon (ID, antallseter, antallrader)
+                VALUES (1, 186, 31)""")
+cursor.execute("""INSERT INTO setekonfigurasjon (ID, antallseter, antallrader)
+                VALUES (2, 180, 30)""")
+cursor.execute("""INSERT INTO setekonfigurasjon (ID, antallseter, antallrader)
+                VALUES (3, 38, 10)""")
+
+# Insert setekonf_rad for Boeing 737 800
+for row in range(1, 32):
+    erNødutgang = (row == 13)
+    cursor.execute("""INSERT INTO setekonf_rad (setekonfigurasjonID, radnummer, antallseter, vedNødutgang)
+                    VALUES (1, ?, ?, ?)""", (row, 6, erNødutgang))
+
+# Insert setekonf_rad for Airbus a320neo
+for row in range(1, 31):
+    erNødutgang = (row == 11 or row == 12)
+    cursor.execute("""INSERT INTO setekonf_rad (setekonfigurasjonID, radnummer, antallseter, vedNødutgang)
+                    VALUES (2, ?, ?, ?)""", (row, 6, erNødutgang))
+
+# Insert setekonf_rad for Dash-8 100
+cursor.execute("""INSERT INTO setekonf_rad (setekonfigurasjonID, radnummer, antallseter, vedNødutgang)
+                    VALUES (3, ?, ?, ?)""", (1, 4, False))
+for row in range(2, 11):
+    erNødutgang = (row == 5)
+    cursor.execute("""INSERT INTO setekonf_rad (setekonfigurasjonID, radnummer, antallseter, vedNødutgang)
+                    VALUES (3, ?, ?, ?)""", (row, 4, erNødutgang))
+
 # Insert flytyper
-cursor.execute("""INSERT INTO flytype (navn, antallseter, førsteProduksjonsår, sistProduksjonsår, produsent)
-                  VALUES ('Boeing 737 800', 189, 1997, 2020, 'The Boeing Company')""")
-cursor.execute("""INSERT INTO flytype (navn, antallseter, førsteProduksjonsår, sistProduksjonsår, produsent)
-                  VALUES ('Airbus a320neo', 180, 2016, NULL, 'Airbus Group')""")
-cursor.execute("""INSERT INTO flytype (navn, antallseter, førsteProduksjonsår, sistProduksjonsår, produsent)
-                  VALUES ('Dash-8 100', 39, 1984, 2005, 'De Havilland Canada')""")
+cursor.execute("""INSERT INTO flytype (navn, setekonfigurasjonID, førsteProduksjonsår, sistProduksjonsår, produsent)
+                  VALUES ('Boeing 737 800', 1, 1997, 2020, 'The Boeing Company')""")
+cursor.execute("""INSERT INTO flytype (navn, setekonfigurasjonID, førsteProduksjonsår, sistProduksjonsår, produsent)
+                  VALUES ('Airbus a320neo', 2, 2016, NULL, 'Airbus Group')""")
+cursor.execute("""INSERT INTO flytype (navn, setekonfigurasjonID, førsteProduksjonsår, sistProduksjonsår, produsent)
+                  VALUES ('Dash-8 100', 3, 1984, 2005, 'De Havilland Canada')""")
 cursor.execute("INSERT INTO flyselskap (flyselskapkode, navn) VALUES ('DY', 'Norwegian')")
 
 # Insert the four Boeing 737 800 aircraft operated by Norwegian
