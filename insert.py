@@ -74,5 +74,109 @@ for aircraft in wideroe_aircraft_data:
                         VALUES (?, ?, ?, ?, ?, ?)""", aircraft)
     except sqlite3.Error as e:
         print(f"Error inserting aircraft {aircraft[0]}: {e}")
+
+# Insert flyruter
+routes = [
+    {
+        'route_num': 'WF1311',
+        'weekday_code': '12345',
+        'start_airport': 'TRD',
+        'end_airport': 'BOO',
+        'departure_time': '15:15',
+        'arrival_time': '16:20',
+        'aircraft_type': 'Dash-8 100',
+        'airline_code': 'WF',
+        'prices': [
+            ('premium', 2018),
+            ('økonomi', 899),
+            ('budsjett', 599)
+        ]
+    },
+    {
+        'route_num': 'WF1302',
+        'weekday_code': '12345',
+        'start_airport': 'BOO',
+        'end_airport': 'TRD',
+        'departure_time': '07:35',
+        'arrival_time': '08:40',
+        'aircraft_type': 'Dash-8 100',
+        'airline_code': 'WF',
+        'prices': [
+            ('premium', 2018),
+            ('økonomi', 899),
+            ('budsjett', 599)
+        ]
+    },
+    {
+        'route_num': 'DY753',
+        'weekday_code': '1234567',
+        'start_airport': 'TRD',
+        'end_airport': 'OSL',
+        'departure_time': '10:20',
+        'arrival_time': '11:15',
+        'aircraft_type': 'Boeing 737 800',
+        'airline_code': 'DY',
+        'prices': [
+            ('premium', 1500),
+            ('økonomi', 1000),
+            ('budsjett', 500)
+        ]
+    },
+    {
+        'route_num': 'SK332',
+        'weekday_code': '1234567',
+        'start_airport': 'OSL',
+        'end_airport': 'TRD',
+        'departure_time': '08:00',
+        'arrival_time': '09:05',
+        'aircraft_type': 'Airbus a320neo',
+        'airline_code': 'SK',
+        'prices': [
+            ('premium', 1500),
+            ('økonomi', 1000),
+            ('budsjett', 500)
+        ]
+    }
+]
+
+# Insert each route
+for route in routes:
+    try:
+        # Insert the flight route
+        cursor.execute("""
+            INSERT INTO flyrute (
+                flyrutenummer, ukedagskode, oppstartsdato, sluttdato, 
+                planlagt_avreisetid, planlagt_ankomsttid, startflyplass, endeflyplass
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            route['route_num'],
+            route['weekday_code'],
+            '2024-03-01',
+            '2025-12-31', 
+            route['departure_time'],
+            route['arrival_time'],
+            route['start_airport'],
+            route['end_airport']
+        ))
+        
+        # Insert price categories
+        for price_type, price in route['prices']:
+            cursor.execute("""
+                INSERT INTO billettype_priser (flyrutenummer, billetttype, pris)
+                VALUES (?, ?, ?)
+            """, (route['route_num'], price_type, price))
+        
+        # Link the route to aircraft type and airline
+        cursor.execute("""
+            INSERT INTO OpereresAv (navn, flyselskapkode, flyrutenummer)
+            VALUES (?, ?, ?)
+        """, (route['aircraft_type'], route['airline_code'], route['route_num']))
+        
+        print(f"✅ Route {route['route_num']} inserted successfully")
+        
+    except sqlite3.Error as e:
+        print(f"❌ Error inserting route {route['route_num']}: {e}")
+
+
 conn.commit()
 conn.close()
