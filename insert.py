@@ -44,6 +44,7 @@ for aircraft in aircraft_data:
         print(f"Error inserting aircraft {aircraft[0]}: {e}")
 
 #Insert Sas aircrafts
+cursor.execute("INSERT INTO flyselskap (flyselskapkode, navn) VALUES ('SK', 'SAS')")
 sas_aircraft_data = [
     ('SE-RUB', '9518', 'Birger Viking', 2020, 'Airbus a320neo', 'SK'),
     ('SE-DIR', '11421', 'Nora Viking', 2023, 'Airbus a320neo', 'SK'),
@@ -90,7 +91,8 @@ routes = [
             ('premium', 2018),
             ('økonomi', 899),
             ('budsjett', 599)
-        ]
+        ],
+        'has_stopover': False
     },
     {
         'route_num': 'WF1302',
@@ -105,7 +107,8 @@ routes = [
             ('premium', 2018),
             ('økonomi', 899),
             ('budsjett', 599)
-        ]
+        ],
+        'has_stopover': False
     },
     {
         'route_num': 'DY753',
@@ -120,7 +123,8 @@ routes = [
             ('premium', 1500),
             ('økonomi', 1000),
             ('budsjett', 500)
-        ]
+        ],
+        'has_stopover': False
     },
     {
         'route_num': 'SK332',
@@ -135,7 +139,41 @@ routes = [
             ('premium', 1500),
             ('økonomi', 1000),
             ('budsjett', 500)
-        ]
+        ],
+        'has_stopover': False
+    },
+    {
+        'route_num': 'SK888',
+        'weekday_code': '12345',
+        'start_airport': 'TRD',
+        'end_airport': 'SVG',
+        'departure_time': '10:00',
+        'arrival_time': '12:10',
+        'aircraft_type': 'Airbus a320neo',
+        'airline_code': 'SK',
+        'prices': [
+            ('premium', 2200),
+            ('økonomi', 1700),
+            ('budsjett', 1000)
+        ],
+        'has_stopover': True,
+        'stopover': {
+            'airport': 'BGO',
+            'arrival': '11:10',
+            'departure': '11:40',
+            'segments': {
+                'TRD-BGO': [
+                    ('premium', 2000),
+                    ('økonomi', 1500),
+                    ('budsjett', 800)
+                ],
+                'BGO-SVG': [
+                    ('premium', 1000),
+                    ('økonomi', 700),
+                    ('budsjett', 350)
+                ]
+            }
+        }
     }
 ]
 
@@ -162,7 +200,7 @@ for route in routes:
         # Insert price categories
         for price_type, price in route['prices']:
             cursor.execute("""
-                INSERT INTO billettype_priser (flyrutenummer, billetttype, pris)
+                INSERT INTO billettype (flyrutenummer, billetttype, pris)
                 VALUES (?, ?, ?)
             """, (route['route_num'], price_type, price))
         
@@ -172,11 +210,34 @@ for route in routes:
             VALUES (?, ?, ?)
         """, (route['aircraft_type'], route['airline_code'], route['route_num']))
         
+        # Handle stopover if present
+        if route['has_stopover']:
+            cursor.execute("""
+                INSERT INTO mellomlanding (
+                    avgangstid, ankomsttid, flyrutenummer, flyplasskode
+                ) VALUES (?, ?, ?, ?)
+            """, (
+                route['stopover']['departure'],
+                route['stopover']['arrival'],
+                route['route_num'],
+                route['stopover']['airport']
+            ))
+            
+            # Print segment prices for documentation
+            print(f"\n📝 Segment prices for {route['route_num']} (not directly stored in database):")
+            print(f"  {route['start_airport']}-{route['stopover']['airport']} segment:")
+            for price_type, price in route['stopover']['segments'][f"{route['start_airport']}-{route['stopover']['airport']}"]:
+                print(f"    - {price_type}: {price} NOK")
+            
+            print(f"  {route['stopover']['airport']}-{route['end_airport']} segment:")
+            for price_type, price in route['stopover']['segments'][f"{route['stopover']['airport']}-{route['end_airport']}"]:
+                print(f"    - {price_type}: {price} NOK")
+        
         print(f"✅ Route {route['route_num']} inserted successfully")
         
     except sqlite3.Error as e:
         print(f"❌ Error inserting route {route['route_num']}: {e}")
 
-
 conn.commit()
 conn.close()
+print("\n✅ All routes and aircraft data inserted successfully")

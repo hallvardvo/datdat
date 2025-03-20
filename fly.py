@@ -88,7 +88,7 @@ cursor.execute("""CREATE TABLE total_bestilling (
                     kundenummer INTEGER,
                     FOREIGN KEY (kundenummer) REFERENCES kunde(kundenummer))""")
 
-cursor.execute("""CREATE TABLE billettype_priser (
+cursor.execute("""CREATE TABLE billettype (
                     flyrutenummer TEXT,
                     billetttype TEXT,
                     pris INTEGER,
@@ -104,7 +104,7 @@ cursor.execute("""CREATE TABLE billetter (
                     DRID INTEGER,
                     PRIMARY KEY (referansenr, nummer),
                     FOREIGN KEY (referansenr) REFERENCES total_bestilling(referansenr),
-                    FOREIGN KEY (flyrutenummer, billetttype) REFERENCES billettype_priser(flyrutenummer, billetttype),
+                    FOREIGN KEY (flyrutenummer, billetttype) REFERENCES billettype(flyrutenummer, billetttype),
                     FOREIGN KEY (flyrutenummer, løpenummer) REFERENCES flyvning(flyrutenummer, løpenummer))""")
 
 cursor.execute("""CREATE TABLE delreise (
