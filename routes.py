@@ -4,7 +4,7 @@ def main():
     conn = sqlite3.connect('fly.sqlite')
     cursor = conn.cursor()
 
-    # Spør i Terminalen
+    # ----------------- Spørsmål i Terminalen -----------------
     airport = input("Hvilken flyplasskode ønsker du? (f.eks. TRD): ").strip().upper()
     day_of_week = input("Hvilken ukedag (tall 1=mandag ... 7=søndag)? ").strip()
     direction = input("Ønsker du avganger (D) eller ankomster (A)? ").strip().upper()
@@ -16,32 +16,32 @@ def main():
         # flyrute.planlagt_avreisetid hvis airport er start eller flyrute.avgangstid hvis airport er mellomlanding.
         sql = """
         SELECT r.flyrutenummer,
-               CASE 
+                CASE 
                     WHEN r.startflyplass = :airport THEN r.planlagt_avreisetid
                     ELSE m.avgangstid
-               END AS departure_time
+                END AS departure_time
         FROM flyrute r
         LEFT JOIN mellomlanding m
             ON r.flyrutenummer = m.flyrutenummer
-               AND m.flyplasskode = :airport
+                AND m.flyplasskode = :airport
         WHERE r.ukedagskode LIKE '%' || :day || '%'
-          AND (r.startflyplass = :airport OR m.flyplasskode = :airport)
+            AND (r.startflyplass = :airport OR m.flyplasskode = :airport)
         ORDER BY departure_time
         """
     else:
         # Arrivals: ca samme logikk, men vi ser på ankomsttider heller.
         sql = """
         SELECT r.flyrutenummer,
-               CASE 
+                CASE 
                     WHEN r.endeflyplass = :airport THEN r.planlagt_ankomsttid
                     ELSE m.ankomsttid
-               END AS arrival_time
+                END AS arrival_time
         FROM flyrute r
         LEFT JOIN mellomlanding m
             ON r.flyrutenummer = m.flyrutenummer
-               AND m.flyplasskode = :airport
+                AND m.flyplasskode = :airport
         WHERE r.ukedagskode LIKE '%' || :day || '%'
-          AND (r.endeflyplass = :airport OR m.flyplasskode = :airport)
+            AND (r.endeflyplass = :airport OR m.flyplasskode = :airport)
         ORDER BY arrival_time
         """
 
