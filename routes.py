@@ -5,9 +5,10 @@ def main():
     cursor = conn.cursor()
 
     # ----------------- Spørsmål i Terminalen -----------------
-    airport = input("Hvilken flyplasskode ønsker du? (f.eks. TRD): ").strip().upper()
-    day_of_week = input("Hvilken ukedag (tall 1=mandag ... 7=søndag)? ").strip()
-    direction = input("Ønsker du avganger (D) eller ankomster (A)? ").strip().upper()
+    airport = input("Hvilken flyplasskode ønsker du? |BOO|BG0|OSL|SVG|TRD|: ").strip().upper()
+    day_of_week = input("Hvilken ukedag |1|2|3|4|5|6|7|? ").strip()
+    direction = input("Ønsker du avganger |D| eller ankomster |A|? ").strip().upper()
+    # ---------------------------------------------------------
 
     # Spør databasen om avganger eller ankomster
     # ukdag = 1234567, flyplass = XXX, avgang/ankomst = D/A
@@ -64,13 +65,6 @@ def main():
 
 
 def hent_alle_flyplasser_for_rute(cursor, flyrutenummer):
-    """
-    Henter alle flyplasser i rekkefølge for gitt rute.
-    1) startflyplass fra flyrute
-    2) eventuelle mellomlandinger (sortert på MID)
-    3) endeflyplass fra flyrute
-    Returnerer en liste, f.eks. ['TRD', 'BGO', 'SVG'].
-    """
     # startfylpass og endeflyplass
     cursor.execute("""
         SELECT startflyplass, endeflyplass
