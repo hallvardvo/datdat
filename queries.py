@@ -1,3 +1,5 @@
+# Oppgave 5
+
 import sqlite3
 conn = sqlite3.connect('fly.sqlite')
 print("Connection successful")
@@ -23,16 +25,13 @@ ORDER BY
 
 results = cursor.fetchall()
 
-# Get the column names
 column_names = [description[0] for description in cursor.description]
 
-# Print header
 print("\nQuery Results:")
 print("-" * 50)
 print(f"{column_names[0]:<15} {column_names[1]:<20} {column_names[2]:<10}")
 print("-" * 50)
 
-# Print rows
 for row in results:
     print(f"{row[0]:<15} {row[1]:<20} {row[2]:<10}")
 

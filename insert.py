@@ -1,3 +1,5 @@
+# Oppgave 1, 2, 3, 4, og 7
+
 import sqlite3
 conn = sqlite3.connect('fly.sqlite')
 print("Connection successful")
