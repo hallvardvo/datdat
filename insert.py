@@ -253,20 +253,7 @@ for route in routes:
                 route['stopover']['airport']
             ))
             
-            # Print segment prices for documentation
-            print(f"\n📝 Segment prices for {route['route_num']} (not directly stored in database):")
-            print(f"  {route['start_airport']}-{route['stopover']['airport']} segment:")
-            for price_type, price in route['stopover']['segments'][f"{route['start_airport']}-{route['stopover']['airport']}"]:
-                print(f"    - {price_type}: {price} NOK")
             
-            print(f"  {route['stopover']['airport']}-{route['end_airport']} segment:")
-            for price_type, price in route['stopover']['segments'][f"{route['stopover']['airport']}-{route['end_airport']}"]:
-                print(f"    - {price_type}: {price} NOK")
-        
-        print(f"✅ Route {route['route_num']} inserted successfully")
-        
-    except sqlite3.Error as e:
-        print(f"❌ Error inserting route {route['route_num']}: {e}")
 
 # 4)
 cursor.execute("""INSERT INTO flyvning (flyrutenummer, løpenummer, avgangtid, ankomsttid, status)
@@ -348,6 +335,22 @@ VALUES
  (2008, '7B', 2008, 1),
  (2009, '8A', 2009, 1),
  (2010, '8B', 2010, 1);
+""")
+
+# Add entries to harDelReise to link journey segments to flight routes
+cursor.execute("""
+INSERT INTO harDelReise (DRID, flyrutenummer)
+VALUES
+ (2001, 'WF1302'),
+ (2002, 'WF1302'),
+ (2003, 'WF1302'),
+ (2004, 'WF1302'),
+ (2005, 'WF1302'),
+ (2006, 'WF1302'),
+ (2007, 'WF1302'),
+ (2008, 'WF1302'),
+ (2009, 'WF1302'),
+ (2010, 'WF1302');
 """)
 
 conn.commit()
