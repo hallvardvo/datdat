@@ -209,49 +209,49 @@ routes = [
 
 # Insert each route
 for route in routes:
-    try:
-        # Insert the flight route
+
+    # Insert the flight route
+    cursor.execute("""
+        INSERT INTO flyrute (
+            flyrutenummer, ukedagskode, oppstartsdato, sluttdato, 
+            planlagt_avreisetid, planlagt_ankomsttid, startflyplass, endeflyplass
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        route['route_num'],
+        route['weekday_code'],
+        '2024-03-01',
+        '2025-12-31', 
+        route['departure_time'],
+        route['arrival_time'],
+        route['start_airport'],
+        route['end_airport']
+    ))
+    
+    # Insert price categories
+    for price_type, price in route['prices']:
         cursor.execute("""
-            INSERT INTO flyrute (
-                flyrutenummer, ukedagskode, oppstartsdato, sluttdato, 
-                planlagt_avreisetid, planlagt_ankomsttid, startflyplass, endeflyplass
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            route['route_num'],
-            route['weekday_code'],
-            '2024-03-01',
-            '2025-12-31', 
-            route['departure_time'],
-            route['arrival_time'],
-            route['start_airport'],
-            route['end_airport']
-        ))
-        
-        # Insert price categories
-        for price_type, price in route['prices']:
-            cursor.execute("""
-                INSERT INTO billettype (flyrutenummer, billetttype, pris)
-                VALUES (?, ?, ?)
-            """, (route['route_num'], price_type, price))
-        
-        # Link the route to aircraft type and airline
-        cursor.execute("""
-            INSERT INTO OpereresAv (navn, flyselskapkode, flyrutenummer)
+            INSERT INTO billettype (flyrutenummer, billetttype, pris)
             VALUES (?, ?, ?)
-        """, (route['aircraft_type'], route['airline_code'], route['route_num']))
-        
-        # Handle stopover if present
-        if route['has_stopover']:
-            cursor.execute("""
-                INSERT INTO mellomlanding (
-                    avgangstid, ankomsttid, flyrutenummer, flyplasskode
-                ) VALUES (?, ?, ?, ?)
-            """, (
-                route['stopover']['departure'],
-                route['stopover']['arrival'],
-                route['route_num'],
-                route['stopover']['airport']
-            ))
+        """, (route['route_num'], price_type, price))
+    
+    # Link the route to aircraft type and airline
+    cursor.execute("""
+        INSERT INTO OpereresAv (navn, flyselskapkode, flyrutenummer)
+        VALUES (?, ?, ?)
+    """, (route['aircraft_type'], route['airline_code'], route['route_num']))
+    
+    # Handle stopover if present
+    if route['has_stopover']:
+        cursor.execute("""
+            INSERT INTO mellomlanding (
+                avgangstid, ankomsttid, flyrutenummer, flyplasskode
+            ) VALUES (?, ?, ?, ?)
+        """, (
+            route['stopover']['departure'],
+            route['stopover']['arrival'],
+            route['route_num'],
+            route['stopover']['airport']
+        ))
             
             
 
